@@ -3,9 +3,18 @@ import {CHECK_EMAIL, CHECK_PASSWORD} from '../constants/actionTypes';
 const loginReducers = (state = [], action) => {
     switch (action.type) {
         case CHECK_EMAIL:
-            const reg = /^[A-z0-9-]+@+[A-z0-9-]+?\.[A-z0-9-.]+/;
+            let condition = 1;
+
+            /* Данную проверку добавил по причине того, что после символа "@" все русские символы заменяются на
+            коды, которые в дальнейшем проходят проверку регулярным выражением. К сожалению не получилось придумать
+            другого способа для исправления этой проблемы.  */
+            if (/xn--/.test(action.payload)) {
+                condition = -1;
+            }
+
+            const reg = /^[0-9a-z]*[0-9a-z-.]*[0-9a-z]\@[0-9a-z][0-9a-z-]+\.*[0-9a-z-.]*[0-9a-z]/i;
             
-            if (!action.payload.replace(reg, '') && action.payload) {
+            if (!action.payload.replace(reg, '') && action.payload && condition == 1) {
                 return {
                     ...state,
                     emailValid: true,
